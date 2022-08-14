@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 
 const player = ref("X");
 const table = ref([
@@ -32,12 +32,19 @@ const winner = computed(() => CalculateWinner(table.value.flat()));
 
 const Move = (x, y) => {
   if (winner.value) return;
-
   if (table.value[x][y] !== "") return;
-
   table.value[x][y] = player.value;
-
   player.value = player.value === "X" ? "O" : "X";
+
+  // to sessionStorage
+
+  const trackMoves = table.value.flat().toString();
+
+  document.getElementById("trackMovesID").innerHTML = trackMoves;
+
+  console.log(trackMoves);
+
+  //
 };
 
 const Reset = () => {
@@ -48,6 +55,20 @@ const Reset = () => {
   ];
   player.value = "X";
 };
+
+// sessionStorage wins
+
+const history = ref([]);
+watch(winner, (current, previous) => {
+  if (current && !previous) {
+    history.value.push(current);
+    sessionStorage.setItem("history", JSON.stringify(history.value));
+  }
+});
+
+onMounted(() => {
+  history.value = JSON.parse(sessionStorage.getItem("history")) ?? [];
+});
 </script>
 
 <template>
@@ -78,6 +99,20 @@ const Reset = () => {
     >
       Reset
     </button>
+
+    <!-- sesionS -->
+
+    <h2 class="mt-5 text-4xl">History</h2>
+    <div v-for="(game, idx) in history" :key="idx">
+      Game{{ idx + 1 }}: {{ game }} won
+    </div>
+
+    <!-- moves  -->
+
+    <div>
+      <p class="mt-5 text-4xl">Moves made</p>
+      <p class="mt-5 text-1xl" id="trackMovesID"></p>
+    </div>
   </main>
 </template>
 
