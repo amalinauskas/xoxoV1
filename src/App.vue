@@ -1,5 +1,49 @@
+<script>
+const baseURL = "http://localhost:5000/moves";
+export default {
+  name: "App",
+  data() {
+    return {
+      postResult: null,
+    };
+  },
+  methods: {
+    fortmatResponse(res) {
+      return JSON.stringify(res, null, 2);
+    },
+    async postData() {
+      const postData = {
+        move: document.getElementById("trackMovesID").innerHTML,
+      };
+      try {
+        const res = await fetch(`${baseURL}`, {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postData),
+        });
+        if (!res.ok) {
+          const message = `An error has occured: ${res.status} - ${res.statusText}`;
+          throw new Error(message);
+        }
+        const data = await res.json();
+        const result = {
+          data: data,
+        };
+        this.postResult = this.fortmatResponse(result);
+      } catch (err) {
+        this.postResult = err.message;
+      }
+    },
+    clearPostOutput() {},
+  },
+};
+</script>
+<!--  -->
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
+import TrackMove from "./components/TrackMove.vue";
 
 const player = ref("X");
 const table = ref([
@@ -36,15 +80,10 @@ const Move = (x, y) => {
   table.value[x][y] = player.value;
   player.value = player.value === "X" ? "O" : "X";
 
-  // to sessionStorage
-
+  // to consoleLog
   const trackMoves = table.value.flat().toString();
-
   document.getElementById("trackMovesID").innerHTML = trackMoves;
-
   console.log(trackMoves);
-
-  //
 };
 
 const Reset = () => {
@@ -100,7 +139,7 @@ onMounted(() => {
       Reset
     </button>
 
-    <!-- sesionS -->
+    <!-- sesions -->
 
     <h2 class="mt-5 text-4xl">History</h2>
     <div v-for="(game, idx) in history" :key="idx">
@@ -112,6 +151,21 @@ onMounted(() => {
     <div>
       <p class="mt-5 text-4xl">Moves made</p>
       <p class="mt-5 text-1xl" id="trackMovesID"></p>
+      <!-- Post data to BE -->
+      <div id="app" class="content-start">
+        <div>
+          <div class="mt-5 text-4xl">Vue Fetch POST moves</div>
+          <div class="rounded-sm">
+            <button
+              class="mt-5 px-4 py-2 bg-cyan-300 rounded uppercase font-bold hover:bg-cyan-500 duration-300"
+              @click="postData"
+            >
+              Post Data
+            </button>
+            <TrackMove />
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </template>

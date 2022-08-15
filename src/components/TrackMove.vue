@@ -1,5 +1,4 @@
 <template>
-  <h1>Moves Made</h1>
   <div v-for="move in moves" :key="move" class="move">
     <p>
       {{ move.move }}
