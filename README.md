@@ -14,3 +14,5 @@ To launch backend server (json-server)'
 npm run backend
 ```
 
+
+CalculateWinner function taken from React tutorial: https://hy.reactjs.org/tutorial/tutorial.html
