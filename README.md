@@ -1,7 +1,16 @@
-# Vue 3 + Vite
+# Vue 3 + Vite + Tailwind / Tic Tac Toe
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-## Recommended IDE Setup
+To start project you need to install all dependencies or devDependencies from a package.json file, by typing in console:
+```
+npm i
+```
+and then launch it
+```
+npm run dev
+```
+To launch backend server (json-server)'
+```
+npm run backend
+```
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
