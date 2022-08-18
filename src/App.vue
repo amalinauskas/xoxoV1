@@ -1,4 +1,8 @@
 <script>
+import ResetButton from "./components/ResetButton.vue";
+import DisplayMoves from "./components/DisplayMoves.vue";
+import DisplayWinner from "./components/DisplayWinner.vue";
+import GameBoard from "./components/GameBoard.vue";
 const baseURL = "http://localhost:5000/moves";
 export default {
   name: "App",
@@ -54,11 +58,14 @@ export default {
       this.gameFinished = false;
       this.moves = [];
     },
-    move(x, y) {
+    move(payload) {
       if (this.gameFinished) {
         return;
       }
+      let x = payload.x;
+      let y = payload.y;
       if (this.table[x][y] !== "") return;
+
       this.table[x][y] = this.player;
       this.player = this.player === "X" ? "O" : "X";
       this.postData();
@@ -68,7 +75,6 @@ export default {
       if (!lastGameId) {
         return;
       }
-
       try {
         let response = await fetch(
           `http://localhost:5000/moves?gameId=${lastGameId}`
@@ -81,7 +87,6 @@ export default {
         console.log(this.moves);
       } catch (error) {}
     },
-
     async postData() {
       if (this.gameId === 0) {
         this.gameId = Date.now();
@@ -109,7 +114,6 @@ export default {
         };
         this.moves.push(data);
         console.log(data);
-
         let winner = this.calculateWinner(this.table.flat());
         if (winner !== null) {
           this.winner = winner;
@@ -119,40 +123,20 @@ export default {
     },
     clearPostOutput() {},
   },
+  components: { ResetButton, DisplayMoves, DisplayWinner, GameBoard },
 };
 </script>
 
 <template>
   <main class="pt-8 text-center">
-    <h3 class="text-xl mb-4">Player {{ player }} turn</h3>
-
-    <div class="flex flex-col items-center mb-8">
-      <div v-for="(row, x) in table" :key="x" class="flex">
-        <div
-          v-for="(cell, y) in row"
-          :key="y"
-          @click="move(x, y)"
-          :class="`border border-black w-24 h-24 hover:bg-gray-200 duration-300 flex items-center justify-center material-icons-outlined text-4xl cursor-pointer ${
-            cell === 'X' ? 'text-lime-400' : 'text-cyan-400'
-          }`"
-        >
-          {{ cell === "X" ? "X" : cell === "O" ? "O" : "" }}
-        </div>
-      </div>
-    </div>
-    <h2 v-if="winner" class="text-6xl font-bold mb-8">
-      Player <span class="text-yellow-500">{{ winner }}</span> wins
-    </h2>
-    <button
-      @click="reset()"
-      class="px-4 py-2 bg-cyan-300 rounded uppercase font-bold hover:bg-cyan-500 duration-300"
-    >
-      Reset
-    </button>
-    <div v-for="move in moves" :key="move" class="move">
-      <p>
-        {{ move.move }}
-      </p>
-    </div>
+    <GameBoard :table="table" :player="player" @move="move" />
+    <DisplayWinner v-if="winner" :winner="winner" />
+    <ResetButton @reset="reset()" />
+    <DisplayMoves
+      v-for="move in moves"
+      :key="move"
+      class="move"
+      :twoot="move"
+    />
   </main>
 </template>
